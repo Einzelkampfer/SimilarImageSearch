@@ -222,6 +222,7 @@ std::vector<cv::Mat>* input_channels) {
 
 	CHECK(reinterpret_cast<float*>(input_channels->at(0).data) == net_->input_blobs()[0]->cpu_data()) << "Input channels are not wrapping the input layer of the network.";
 }
+// Get features of specific layer from a image file and output the vector to file
 void Classifier::getFeature(std::string file, std::string outputFile, std::string featureLayer) {
 	cv::Mat img = cv::imread(file, -1);
 	CHECK(!img.empty()) << "Unable to decode image " << file;
@@ -264,7 +265,7 @@ void Classifier::getFeature(std::string file, std::string outputFile, std::strin
 }
 int main(int argc, char** argv) {
 	if (argc != 7) {
-		std::cerr << "Usage: " << argv[0] << " deploy.prototxt network.caffemodel" << " mean.binaryproto labels.txt img.jpg" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " deploy.prototxt network.caffemodel mean.binaryproto outputfile.txt layername img.jpg" << std::endl;
 		return 1;
 	}
 
