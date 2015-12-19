@@ -57,6 +57,33 @@ def pca(matrix, bitNum):
 	result = matrix * P
 	return result
 
+def itq(V, n):
+	# Initialize a orthogonal random rotation matrix R
+	(number, bit) = V.shape
+	# Gaussian distribution of mean 0 and variance 1
+	R = numpy.random.randn(bit, bit)
+	U, V2, S2 = np.linalg.svd(R)
+	R = U[:, range(0, bit)]
+	
+	# Fix and Update iterations
+	for i in range(n):
+		print 'Iteration ' + str(i + 1) + ' loading..'
+		# Fix R and update B(UX)
+		Z = V * R
+		(row, col) = Z.shape
+		UX = numpy.ones((row, col)) * -1
+		UX[Z >= 0] = 1
+		
+		# Fix B and update R
+		C = UX.T * V
+		UB, sigma, UA = numpy.linalg.svd(C)
+		R = UA * UB.T
+	B = UX
+	# Transform into binary code
+	B[B < 0] = 0
+	return (B, R)
+
+
 if __name__ == '__main__':
 	matrix = readFeatureFile("../../features.txt")
 	print "done"
