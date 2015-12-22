@@ -188,32 +188,33 @@ def pcaMulti(matFile, P, outputFile):
 		data = []
 	outObj.close()
 
-def itq(matrix):
+def itq(matrix, iterationTime):
 	# Initialize a orthogonal random rotation matrix R
-	samplesize, bit = matrix.shape
-	print "%d * %d" % (samplesize, bit)
+	samplesize, bitNum = matrix.shape
 	# Gaussian distribution of mean 0 and variance 1
-	R = numpy.random.randn(256, 256)
-	U, V2, S2 = np.linalg.svd(R)
-	R = U[:, range(0, bit)]
-	
+	R = numpy.random.randn(bitNum, bitNum)
+	U, V2, S2 = numpy.linalg.svd(R)
+	R = U[:, range(0, bitNum)]
 	# Fix and Update iterations
-	for i in range(n):
-		print 'Iteration ' + str(i + 1) + ' loading..'
+	for i in range(iterationTime):
+		startTime = time.time()
+		print 'Iteration %d' % (i + 1) 
 		# Fix R and update B(UX)
 		Z = matrix * R
 		row, col = Z.shape
 		UX = numpy.ones((row, col)) * -1
 		UX[Z >= 0] = 1
-		
+		del(Z)
 		# Fix B and update R
-		C = UX.T * V
+		C = UX.T * matrix
 		UB, sigma, UA = numpy.linalg.svd(C)
 		R = UA * UB.T
-	B = UX
+		endTime = time.time()
+		print "time used:%f seconds" % (endTime - startTime)
 	# Transform into binary code
-	B[B < 0] = 0
-	return (B, R)
+	UX[UX < 0] = 0
+	print UX
+	return (UX, R)
 
 if __name__ == '__main__':
 	# featureNum = 1024
@@ -253,8 +254,10 @@ if __name__ == '__main__':
 	matrix = numpy.mat(matrix)
 	endClock = time.time()
 	print "PCA done, time used:%f seconds" % (endClock - startClock)
-	print "begin itq"
 	startClock = time.time()
-	itq(matrix)
+	B, R = itq(matrix, 50)
 	endClock = time.time()
 	print "ITQone, time used:%f seconds" % (endClock - startClock)
+	writeMatrixToFile("%s/itqresult.txt" % tempDirName, B)
+	writeMatrixToFile("%s/rmatrix.txt" % tempDirName, R)
+
