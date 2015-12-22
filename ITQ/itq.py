@@ -7,8 +7,46 @@ import time
 
 tempDirName = "../../temp"
 covarianceFileName = "covariance.txt"
+centralizedFile = "centralized.txt"
 featureFile = "../../features.txt"
+pmatrixFile = "pmatrix.txt"
 pcaResultFile = "pcaresult.txt"
+
+def readMatrixFromFile(filename, haveImgPath=False):
+	fileObj = open(filename, "r")
+	line = fileObj.readline()
+	data = []
+	while True:
+		if not line:
+			break
+		line = line.strip()
+		items = line.split(",")
+		if haveImgPath:
+			items = items[1:]
+		for i in range(len(items)):
+			items[i] = float(items[i])
+		data.append(items)
+		line = fileObj.readline()
+	return data
+
+def writeMatrixToFile(filename, matrix):
+	fileObj = open(filename, "w")
+	if isinstance(matrix, (numpy.matrixlib.defmatrix.matrix)):
+		row, col = matrix.shape
+		for i in range(row):
+			for j in range(col):
+				fileObj.write(str(matrix[i, j]))
+				if j != col - 1:
+					fileObj.write(",")
+			fileObj.write("\n")
+	else:
+		for row in matrix:
+			for i in range(len(row)):
+				fileObj.write(str(row[i]))
+				if i != len(row) - 1:
+					fileObj.write(",")
+			fileObj.write("\n")
+	fileObj.close()
 
 def itq(V, n):
 	# Initialize a orthogonal random rotation matrix R
@@ -37,7 +75,6 @@ def itq(V, n):
 	return (B, R)
 
 def splitColumn(fileName, colNum):
-	# splitFiles = []
 	if not os.path.exists(tempDirName):
 		os.mkdir(tempDirName)
 	indexStart = 0
@@ -81,8 +118,10 @@ def readColFile(num):
 	return content
 
 def calCovarianceMat(featureNum):
-	covariance = [[0.0] * featureNum] * featureNum
-	buffSize = 128
+	covariance = []
+	for i in range(featureNum):
+		covariance.append([0.0] * featureNum)
+	buffSize = 64
 	for i in range(featureNum / buffSize):
 		indexStart = i * buffSize
 		data = []
@@ -113,14 +152,7 @@ def calCovarianceMat(featureNum):
 					covariance[y][x] = covariance[x][y]
 			e = time.time()
 			sys.stdout.write("time used:%f seconds\n" % (e - s))
-	fileObj = open("%s/%s" % (tempDirName, covarianceFileName), "w")
-	for i in range(featureNum):
-		for j in range(featureNum):
-			fileObj.write(str(covariance[i][j]))
-			if j != featureNum - 1:
-				fileObj.write(",")
-		fileObj.write("\n")
-	fileObj.close()
+	writeMatrixToFile("%s/%s" % (tempDirName, covarianceFileName), covariance)
 	covariance = numpy.mat(covariance)
 	return covariance
 
@@ -137,30 +169,53 @@ def calPmatrix(bitNum, covariance):
 	k = bitNum
 	index = index[:k]
 	P = eigenvector[:, index]
+	print str(1.0 * sum(eigenvalue[:k]) / sum(eigenvalue))
+	writeMatrixToFile("%s/%s" % (tempDirName, pmatrixFile), P)
 	return P
 
 def pcaMulti(matFile, P, outputFile):
 	fileObj = open(matFile, "r")
 	outObj = open(outputFile, "w")
 	line = fileObj.readline()
+	count = 1
+	data = []
+	imgName = []
 	while True:
 		if not line:
 			break
 		items = line.strip().split(',')
 		imgPath = items[0]
+		imgName.append(imgPath)
 		items = items[1:]
-		outObj.write("%s," % imgPath)
 		for i in range(len(items)):
 			items[i] = float(items[i])
-		items = numpy.mat(items)
-		resultRow = items * P
-		row, col = resultRow.shape
-		for i in range(col):
-			outObj.write("%f" % resultRow[0, i])
-			if i != col - 1:
-				outObj.write(",")
-		outObj.write("\n")
+		data.append(items)
+		if len(data) == 50000:
+			data = numpy.mat(data)
+			result = data * P
+			row, col = result.shape
+			for i in range(row):
+				outObj.write("%s," % imgName[i])
+				for j in range(col):
+					outObj.write("%f" % result[i, j])
+					if j != col - 1:
+						outObj.write(",")
+				outObj.write("\n")
+			data = []
+			imgName = []
+		count += 1
 		line = fileObj.readline()
+	if len(data) != 0:
+		data = numpy.mat(data)
+		result = data * P
+		row, col = result.shape
+		for i in range(row):
+			for j in range(col):
+				outObj.write("%f" % result[i, j])
+				if j != col - 1:
+					outObj.write(",")
+			outObj.write("\n")
+		data = []
 	outObj.close()
 
 if __name__ == '__main__':
@@ -177,31 +232,19 @@ if __name__ == '__main__':
 	if not os.path.exists(covarianceFile):
 		covariance = calCovarianceMat(featureNum)
 	else:
-		covariance = []
-		fileObj = open(covarianceFile, "r")
-		content = fileObj.read().strip().split("\n")
-		for line in content:
-			items = line.split(",")
-			for i in range(len(items)):
-				items[i] = float(items[i])
-			covariance.append(items)
+		covariance = readMatrixFromFile(covarianceFile)
+		covariance = numpy.mat(covariance)
 	print "Calculate covariance done"
-	P = calPmatrix(256, covariance)
-	print "Calculate P matrix done"
-	pcaMulti(featureFile, P, "%s/%s" % (tempDirName, pcaResultFile))
-
-
-	# sClock = time.time()
-	# i = 0
-	# while i < 1024:
-	# 	startClock = time.time()
-	# 	matrix = readFeatureFile("../../features.txt", i, 100)
-	# 	pca(matrix, 128)
-	# 	sys.stdout.write("done\n")
-	# 	i += 100
-	# 	endClock = time.time()
-	# 	sys.stdout.write("time used:%f seconds\n" % (endClock - startClock))
-	# eClock = time.time()
-	# print "total time used:%f seconds" % (eClock - sClock)
-
-	# pca(matrix, 128)
+	P = None
+	pFile = "%s/%s" % (tempDirName, pmatrixFile)
+	if not os.path.exists(pFile):
+		startClock = time.time()
+		P = calPmatrix(256, covariance)
+		endClock = time.time()
+		print "Calculate P matrix done, time used %f seconds" % (endClock - startClock)
+	else:
+		P = readMatrixFromFile(pFile)
+	pcaFile = "%s/%s" % (tempDirName, pcaResultFile)
+	if not os.path.exists(pcaFile):
+		pcaMulti("%s/%s" % (tempDirName, centralizedFile), P, pcaFile)
+	print "PCA done"
