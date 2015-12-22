@@ -14,20 +14,15 @@ pcaResultFile = "pcaresult.txt"
 
 def readMatrixFromFile(filename, haveImgPath=False):
 	fileObj = open(filename, "r")
-	line = fileObj.readline()
-	data = []
-	while True:
-		if not line:
-			break
-		line = line.strip()
-		items = line.split(",")
+	content =  fileObj.read().strip()
+	content = content.split('\n')
+	for i in range(len(content)):
+		content[i] = content[i].split(',')
 		if haveImgPath:
-			items = items[1:]
-		for i in range(len(items)):
-			items[i] = float(items[i])
-		data.append(items)
-		line = fileObj.readline()
-	return data
+			content[i] = content[i][1:]
+		for j in range(len(content[i])):
+			content[i][j] = float(content[i][j])
+	return content
 
 def writeMatrixToFile(filename, matrix):
 	fileObj = open(filename, "w")
@@ -47,32 +42,6 @@ def writeMatrixToFile(filename, matrix):
 					fileObj.write(",")
 			fileObj.write("\n")
 	fileObj.close()
-
-def itq(V, n):
-	# Initialize a orthogonal random rotation matrix R
-	(number, bit) = V.shape
-	# Gaussian distribution of mean 0 and variance 1
-	R = numpy.random.randn(bit, bit)
-	U, V2, S2 = np.linalg.svd(R)
-	R = U[:, range(0, bit)]
-	
-	# Fix and Update iterations
-	for i in range(n):
-		print 'Iteration ' + str(i + 1) + ' loading..'
-		# Fix R and update B(UX)
-		Z = V * R
-		(row, col) = Z.shape
-		UX = numpy.ones((row, col)) * -1
-		UX[Z >= 0] = 1
-		
-		# Fix B and update R
-		C = UX.T * V
-		UB, sigma, UA = numpy.linalg.svd(C)
-		R = UA * UB.T
-	B = UX
-	# Transform into binary code
-	B[B < 0] = 0
-	return (B, R)
 
 def splitColumn(fileName, colNum):
 	if not os.path.exists(tempDirName):
@@ -210,6 +179,7 @@ def pcaMulti(matFile, P, outputFile):
 		result = data * P
 		row, col = result.shape
 		for i in range(row):
+			outObj.write("%s," % imgName[i])
 			for j in range(col):
 				outObj.write("%f" % result[i, j])
 				if j != col - 1:
@@ -218,33 +188,73 @@ def pcaMulti(matFile, P, outputFile):
 		data = []
 	outObj.close()
 
+def itq(matrix):
+	# Initialize a orthogonal random rotation matrix R
+	samplesize, bit = matrix.shape
+	print "%d * %d" % (samplesize, bit)
+	# Gaussian distribution of mean 0 and variance 1
+	R = numpy.random.randn(256, 256)
+	U, V2, S2 = np.linalg.svd(R)
+	R = U[:, range(0, bit)]
+	
+	# Fix and Update iterations
+	for i in range(n):
+		print 'Iteration ' + str(i + 1) + ' loading..'
+		# Fix R and update B(UX)
+		Z = matrix * R
+		row, col = Z.shape
+		UX = numpy.ones((row, col)) * -1
+		UX[Z >= 0] = 1
+		
+		# Fix B and update R
+		C = UX.T * V
+		UB, sigma, UA = numpy.linalg.svd(C)
+		R = UA * UB.T
+	B = UX
+	# Transform into binary code
+	B[B < 0] = 0
+	return (B, R)
+
 if __name__ == '__main__':
-	featureNum = 1024
-	splitDone = True
-	for i in range(featureNum):
-		if not os.path.exists("%s/%d.txt" % (tempDirName, i)):
-			splitDone = False
-	if not splitDone:
-		splitColumn(featureFile, featureNum)
-	print "split file done"
-	covariance = None
-	covarianceFile = "%s/%s" % (tempDirName, covarianceFileName)
-	if not os.path.exists(covarianceFile):
-		covariance = calCovarianceMat(featureNum)
-	else:
-		covariance = readMatrixFromFile(covarianceFile)
-		covariance = numpy.mat(covariance)
-	print "Calculate covariance done"
-	P = None
-	pFile = "%s/%s" % (tempDirName, pmatrixFile)
-	if not os.path.exists(pFile):
-		startClock = time.time()
-		P = calPmatrix(256, covariance)
-		endClock = time.time()
-		print "Calculate P matrix done, time used %f seconds" % (endClock - startClock)
-	else:
-		P = readMatrixFromFile(pFile)
+	# featureNum = 1024
+	# splitDone = True
+	# for i in range(featureNum):
+	# 	if not os.path.exists("%s/%d.txt" % (tempDirName, i)):
+	# 		splitDone = False
+	# if not splitDone:
+	# 	splitColumn(featureFile, featureNum)
+	# print "split file done"
+	# covariance = None
+	# covarianceFile = "%s/%s" % (tempDirName, covarianceFileName)
+	# if not os.path.exists(covarianceFile):
+	# 	covariance = calCovarianceMat(featureNum)
+	# else:
+	# 	covariance = readMatrixFromFile(covarianceFile)
+	# 	covariance = numpy.mat(covariance)
+	# print "Calculate covariance done"
+	# P = None
+	# pFile = "%s/%s" % (tempDirName, pmatrixFile)
+	# if not os.path.exists(pFile):
+	# 	startClock = time.time()
+	# 	P = calPmatrix(256, covariance)
+	# 	endClock = time.time()
+	# 	print "Calculate P matrix done, time used %f seconds" % (endClock - startClock)
+	# else:
+	# 	P = readMatrixFromFile(pFile)
+	startClock = time.time()
 	pcaFile = "%s/%s" % (tempDirName, pcaResultFile)
 	if not os.path.exists(pcaFile):
 		pcaMulti("%s/%s" % (tempDirName, centralizedFile), P, pcaFile)
-	print "PCA done"
+	matrix = readMatrixFromFile(pcaFile, haveImgPath=True)
+	for i in range(len(matrix)):
+		if (len(matrix[i]) != 256):
+			print "%d:"
+	# matrix = matrix[:456500]
+	matrix = numpy.mat(matrix)
+	endClock = time.time()
+	print "PCA done, time used:%f seconds" % (endClock - startClock)
+	print "begin itq"
+	startClock = time.time()
+	itq(matrix)
+	endClock = time.time()
+	print "ITQone, time used:%f seconds" % (endClock - startClock)
