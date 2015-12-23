@@ -8,6 +8,7 @@ import time
 tempDirName = "../../temp"
 covarianceFileName = "covariance.txt"
 centralizedFile = "centralized.txt"
+meanFile = "mean.txt"
 featureFile = "../../features.txt"
 pmatrixFile = "pmatrix.txt"
 pcaResultFile = "pcaresult.txt"
@@ -48,6 +49,7 @@ def splitColumn(fileName, colNum):
 		os.mkdir(tempDirName)
 	indexStart = 0
 	buffSize = 128
+	meanObj = open("%s/%s" % (tempDirName, meanFile), "w")
 	while indexStart < colNum:
 		sys.stdout.write("dealing from col %d to col %d\n" % (indexStart, indexStart + buffSize - 1))
 		s = time.time()
@@ -67,6 +69,7 @@ def splitColumn(fileName, colNum):
 		data = numpy.mat(data)
 		row, col = data.shape
 		for i in range(col):
+			meanObj.write("%f\n" % data[:, i].mean())
 			data[:, i] -= data[:, i].mean()
 
 		for i in range(indexStart, indexStart + buffSize):
@@ -78,6 +81,7 @@ def splitColumn(fileName, colNum):
 		indexStart += buffSize
 		tempObj.close()
 		fileObj.close()
+	meanObj.close()
 
 def readColFile(num):
 	fileObj = open("%s/%d.txt" % (tempDirName, num), "r")
@@ -211,9 +215,13 @@ def itq(matrix, iterationTime):
 		R = UA * UB.T
 		endTime = time.time()
 		print "time used:%f seconds" % (endTime - startTime)
+	Z = matrix * R
+	row, col = Z.shape
+	UX = numpy.ones((row, col)) * -1
+	UX[Z >= 0] = 1
+	del(Z)
 	# Transform into binary code
 	UX[UX < 0] = 0
-	print UX
 	return (UX, R)
 
 if __name__ == '__main__':
@@ -247,9 +255,6 @@ if __name__ == '__main__':
 	if not os.path.exists(pcaFile):
 		pcaMulti("%s/%s" % (tempDirName, centralizedFile), P, pcaFile)
 	matrix = readMatrixFromFile(pcaFile, haveImgPath=True)
-	for i in range(len(matrix)):
-		if (len(matrix[i]) != 256):
-			print "%d:"
 	# matrix = matrix[:456500]
 	matrix = numpy.mat(matrix)
 	endClock = time.time()
