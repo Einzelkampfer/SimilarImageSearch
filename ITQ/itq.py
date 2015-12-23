@@ -222,6 +222,7 @@ def itq(matrix, iterationTime):
 	del(Z)
 	# Transform into binary code
 	UX[UX < 0] = 0
+	UX = UX.astype(int)
 	return (UX, R)
 
 if __name__ == '__main__':
