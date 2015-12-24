@@ -10,7 +10,7 @@ pmatrixFile = "pmatrix.txt"
 pcaResultFile = "pcaresult.txt"
 itqResultFile = "itqresult.txt"
 rmatrixFile = "rmatrix.txt"
-binarySearchFile = "../hashcode.dat"
+binarySearchFile = "../../hashcode.dat"
 
 def readMatrixFromFile(filename, haveImgPath=False):
 	fileObj = open(filename, "r")

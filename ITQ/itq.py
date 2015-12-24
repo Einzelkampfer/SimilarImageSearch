@@ -176,5 +176,6 @@ if __name__ == '__main__':
 	# 	writeMatrixToFile(itqResultFile, B)
 	# 	writeMatrixToFile(rmatrixFile, R)
 	if not os.path.exists(binarySearchFile):
-		popen("./convertBinary.bin %s" % itqResultFile)
+		os.system("g++ convertBinary.cpp -o convertBinary.bin")
+		os.system("./convertBinary.bin %s" % itqResultFile)
 
