@@ -3,12 +3,14 @@ import numpy
 import time
 
 featureFile = "../../features.txt"
-tempDirName = "../../temp"
 covarianceFileName = "covariance.txt"
 centralizedFile = "centralized.txt"
 meanFile = "mean.txt"
 pmatrixFile = "pmatrix.txt"
 pcaResultFile = "pcaresult.txt"
+itqResultFile = "itqresult.txt"
+rmatrixFile = "rmatrix.txt"
+binarySearchFile = "../hashcode.dat"
 
 def readMatrixFromFile(filename, haveImgPath=False):
 	fileObj = open(filename, "r")
