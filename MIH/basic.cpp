@@ -7,11 +7,11 @@
 #include "basic.h"
 using namespace std;
 
-vector<pair<bitset<BIT_NUM>, string> > readdata() {
+vector<pair<bitset<BIT_NUM>, string>* > readdata() {
 	ifstream hashin("../../hashcode.dat", ios_base::binary);
 	ifstream imgin("../../trainImgList.txt");
 	char buff[BYTE_NUM];
-	vector<pair<bitset<BIT_NUM>, string> > data;
+	vector<pair<bitset<BIT_NUM>, string>* > data;
 	while (hashin.read(buff, BYTE_NUM)) {
 		string imgPath;
 		getline(imgin, imgPath);
@@ -22,8 +22,17 @@ vector<pair<bitset<BIT_NUM>, string> > readdata() {
 				temp[BIT_NUM - (i * 8 + j) - 1] = byte[8 - j - 1];
 			}
 		}
-		pair<bitset<BIT_NUM>, string> temppair(temp, imgPath);
+		pair<bitset<BIT_NUM>, string>* temppair = new pair<bitset<BIT_NUM>, string>(temp, imgPath);
 		data.push_back(temppair);
 	}
 	return data;
+}
+
+int getSliceHashCode(bitset<BIT_NUM> b, int begin) {
+	int m = BIT_NUM / SLICE_NUM;
+	bitset<BIT_NUM / SLICE_NUM> slice;
+	for (int i = begin; i < begin + m; ++i) {
+		slice[m - i  + begin - 1] = b[BIT_NUM - i - 1];
+	}
+	return slice.to_ulong();
 }
