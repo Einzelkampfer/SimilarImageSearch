@@ -5,7 +5,7 @@
 #include <bitset>
 #include <string>
 #include <vector>
-#include <map>
+#include <list>
 #include "basic.h"
 class HashTable {
 public:
