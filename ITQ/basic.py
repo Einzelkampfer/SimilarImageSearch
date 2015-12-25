@@ -11,6 +11,7 @@ pcaResultFile = "pcaresult.txt"
 itqResultFile = "itqresult.txt"
 rmatrixFile = "rmatrix.txt"
 binarySearchFile = "../../hashcode.dat"
+featureNum = 1024
 
 def readMatrixFromFile(filename, haveImgPath=False):
 	fileObj = open(filename, "r")
@@ -18,7 +19,7 @@ def readMatrixFromFile(filename, haveImgPath=False):
 	content = content.split('\n')
 	for i in range(len(content)):
 		content[i] = content[i].split(',')
-		# Skip the firse item: image path
+		# Skip the first item: image path
 		if haveImgPath:
 			content[i] = content[i][1:]
 		for j in range(len(content[i])):
@@ -94,18 +95,28 @@ def splitColumn(fileName, colNum):
 		for j in range(buffSize * i, buffSize * i + buffSize):
 			cmd += "%d.txt " % j
 		cmd += "> block%d.txt" % i
-		os.popen(cmd)
+		os.system(cmd)
 	# Paste blocks into matrix
 	cmd = pasteCommand
 	for i in range(featureNum / buffSize):
 		cmd += "block%d.txt" % i
 	cenTemp = "cenTemp.txt"
 	cmd += "> %s" % cenTemp
-	os.popen(cmd)
+	os.system(cmd)
 	imgList = "imageList.txt"
-	os.popen("awk -F ',' '{print $1}' %s > %s" % (featureFile, imgList))
+	os.system("awk -F ',' '{print $1}' %s > %s" % (featureFile, imgList))
 	pasteCommand += "%s %s > %s" % (imgList, cenTemp, centralizedFile)
-	os.popen(pasteCommand)
+	os.system(pasteCommand)
 	# Remove block files
 	for i in range(featureNum / buffSize):
-		os.popen("rm block%d.txt" % i)
+		os.system("rm block%d.txt" % i)
+	os.system("rm %s" % cenTemp)
+	print "split file done"
+
+def checkSplitDone():
+	splitDone = True
+	for i in range(featureNum):
+		if not os.path.exists("%d.txt" % i):
+			splitDone = False
+			break
+	return splitDone

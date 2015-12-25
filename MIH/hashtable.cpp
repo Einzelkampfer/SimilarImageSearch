@@ -6,17 +6,17 @@ HashTable::HashTable() {
 	while (m--) {
 		tableSize <<= 1;
 	}
-	table = new vector<vector<pair<bitset<BIT_NUM>, string>*> >(tableSize);
+	table = new vector<vector<ImageData> >(tableSize);
 	bucketNum = tableSize;
 }
 HashTable::~HashTable() {
 	delete table;
 }
-void HashTable::addItem(pair<bitset<BIT_NUM>, string>* record, int pos) {
-	pair<bitset<BIT_NUM>, string>* temp = record;
+void HashTable::addItem(ImageData record, int pos) {
+	ImageData temp = record;
 	(*table)[pos].push_back(temp);
 }
-vector<pair<bitset<BIT_NUM>, string>*> HashTable::getBucket(int pos) {
+vector<ImageData> HashTable::getBucket(int pos) {
 	return (*table)[pos];
 }
 int HashTable::size() {

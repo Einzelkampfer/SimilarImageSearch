@@ -1,18 +1,14 @@
-#include <iostream>
-#include <fstream>
-#include <bitset>
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
 #include "basic.h"
-using namespace std;
 
-vector<pair<bitset<BIT_NUM>, string>* > readdata() {
+bool cmp(SearchRecord s1, SearchRecord s2) {
+	return s1.second < s2.second;
+}
+
+vector<ImageData> readdata() {
 	ifstream hashin("../../hashcode.dat", ios_base::binary);
 	ifstream imgin("../../trainImgList.txt");
 	char buff[BYTE_NUM];
-	vector<pair<bitset<BIT_NUM>, string>* > data;
+	vector<ImageData> data;
 	while (hashin.read(buff, BYTE_NUM)) {
 		string imgPath;
 		getline(imgin, imgPath);
@@ -23,7 +19,7 @@ vector<pair<bitset<BIT_NUM>, string>* > readdata() {
 				temp[BIT_NUM - (i * 8 + j) - 1] = byte[8 - j - 1];
 			}
 		}
-		pair<bitset<BIT_NUM>, string>* temppair = new pair<bitset<BIT_NUM>, string>(temp, imgPath);
+		ImageData temppair = new pair<bitset<BIT_NUM>, string>(temp, imgPath);
 		data.push_back(temppair);
 	}
 	return data;
@@ -42,20 +38,16 @@ void recurGetCombination(int i, int m, list<int> temp, list<list<int> > &result)
 	if (len == m) {
 		list<int> combination;
 		for (list<int>::iterator it = temp.begin(); it != temp.end(); ++it) {
-			// cout << (*it) << " ";
 			combination.push_back(*it);
 		}
-		// cout << '\n';
 		result.push_back(combination);
 	} else {
 		if (i >= BIT_NUM / BYTE_NUM)
 			return;
 		if (m - temp.size() > BIT_NUM / BYTE_NUM - i)
 			return;
-		// cout << "take " << i << '\n';
 		temp.push_back(i);
 		recurGetCombination(i + 1, m, temp, result);
-		// cout << "not take " << i << "\n";
 		temp.pop_back();
 		recurGetCombination(i + 1, m, temp, result);
 	}
@@ -74,16 +66,23 @@ list<int> getRNeighbourPos(int pos) {
 	list<int> result;
 	for (int k = 0; k <= r; ++k) {
 		list<list<int> > posCombination = getCombinationPos(k);
-		cout << k << ":\n";
+		// cout << k << ":\n";
 		for (list<list<int> >::iterator it1 = posCombination.begin(); it1 != posCombination.end(); it1++) {
 			bitset<BIT_NUM / SLICE_NUM> b(pos);
 			for (list<int>::iterator it2 = (*it1).begin(); it2 != (*it1).end(); it2++) {
 				b.flip(BIT_NUM / SLICE_NUM - (*it2) - 1);
 			}
 			int temp = b.to_ulong();
+			// cout << b << "\t" << temp << "\n";
 			result.push_back(temp);
 		}
 	}
 	return result;
 }
-
+int hammingDistance(bitset<BIT_NUM> b1, bitset<BIT_NUM> b2) {
+	int dist = 0;
+	for (int i = 0; i < BIT_NUM; ++i)
+		if (b1[i] != b2[i])
+			dist++;
+	return dist;
+}

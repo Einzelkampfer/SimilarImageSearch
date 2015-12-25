@@ -1,21 +1,17 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
-#include <iostream>
-#include <fstream>
-#include <bitset>
-#include <string>
-#include <vector>
-#include <list>
+
 #include "basic.h"
+
 class HashTable {
 public:
 	HashTable();
 	~HashTable();
-	void addItem(pair<bitset<BIT_NUM>, string>* record, int pos);
-	vector<pair<bitset<BIT_NUM>, string>*> getBucket(int pos);
+	void addItem(ImageData record, int pos);
+	vector<ImageData> getBucket(int pos);
 	int size();
 private:
-	vector<vector<pair<bitset<BIT_NUM>, string>*> >* table;
+	vector<vector<ImageData> >* table;
 	int bucketNum;
 };
 

@@ -1,26 +1,13 @@
-#include <iostream>
-#include <fstream>
-#include <bitset>
-#include <string>
-#include <vector>
-#include <list>
 #include "basic.h"
 #include "hashtable.h"
+#include "mih.h"
+
 int main() {
-	list<int> result = getRNeighbourPos(0);
-	// HashTable hashtables[SLICE_NUM];
-	// vector<pair<bitset<BIT_NUM>, string>* > data = readdata();
-	// int len = data.size();
-	// for (int i = 0; i < len; ++i) {
-	// 	for (int j = 0; j < SLICE_NUM; ++j) {
-	// 		int pos = getSliceHashCode(data[i] -> first, j * BIT_NUM / SLICE_NUM);
-	// 		hashtables[j].addItem(data[i], pos);
-	// 	}
-	// }
-	
-	// vector<pair<bitset<BIT_NUM>, string>*> bucket = hashtables[31].getBucket(0);
-	// for (int i = 0; i < len; ++i) {
-	// 	cout << bucket[i] -> first << "\n";
-	// }
+	MihSearcher searcher;
+	bitset<BIT_NUM> b(string("1110011100101011111011100010100110111110011011100001110100110011010000110111011100001000010000111001011010100100000010000011110010100101000010100001111101101110111101100010001000011001010110100010110101101111111101010000001001000010010001111110000000100001"));
+	vector<SearchRecord> result = searcher.searchRecord(b);
+	int l = result.size();
+	for (int i = 0; i < l; ++i)
+		cout << result[i].first << "\t" << result[i].second << "\n";
 	return 0;
 }
