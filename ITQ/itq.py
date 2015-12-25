@@ -142,40 +142,40 @@ def itq(matrix, iterationTime):
 	return (UX, R)
 
 if __name__ == '__main__':
-	featureNum = 1024
-	splitDone = True
-	for i in range(featureNum):
-		if not os.path.exists("%d.txt" % i):
-			splitDone = False
-	if not splitDone:
-		splitColumn(featureFile, featureNum)
-	print "split file done"
-	if not os.path.exists(covarianceFileName):
-		covariance = calCovarianceMat(featureNum)
-	else:
-		covariance = readMatrixFromFile(covarianceFileName)
-		covariance = numpy.mat(covariance)
-	print "Calculate covariance done"
-	if not os.path.exists(pmatrixFile):
-		startClock = time.time()
-		P = calPmatrix(256, covariance)
-		endClock = time.time()
-		print "Calculate P matrix done, time used %f seconds" % (endClock - startClock)
-	else:
-		P = readMatrixFromFile(pmatrixFile)
-	if not os.path.exists(pcaResultFile):
-		pcaMulti(centralizedFile, P, pcaFile)
-	if not os.path.exists(itqResultFile):
-		matrix = readMatrixFromFile(pcaResultFile, haveImgPath=True)
-		matrix = numpy.mat(matrix)
-		print "PCA done"
-		startClock = time.time()
-		B, R = itq(matrix, 50)
-		endClock = time.time()
-		print "ITQone, time used:%f seconds" % (endClock - startClock)
-		writeMatrixToFile(itqResultFile, B)
-		writeMatrixToFile(rmatrixFile, R)
+	# featureNum = 1024
+	# splitDone = True
+	# for i in range(featureNum):
+	# 	if not os.path.exists("%d.txt" % i):
+	# 		splitDone = False
+	# if not splitDone:
+	# 	splitColumn(featureFile, featureNum)
+	# print "split file done"
+	# if not os.path.exists(covarianceFileName):
+	# 	covariance = calCovarianceMat(featureNum)
+	# else:
+	# 	covariance = readMatrixFromFile(covarianceFileName)
+	# 	covariance = numpy.mat(covariance)
+	# print "Calculate covariance done"
+	# if not os.path.exists(pmatrixFile):
+	# 	startClock = time.time()
+	# 	P = calPmatrix(256, covariance)
+	# 	endClock = time.time()
+	# 	print "Calculate P matrix done, time used %f seconds" % (endClock - startClock)
+	# else:
+	# 	P = readMatrixFromFile(pmatrixFile)
+	# if not os.path.exists(pcaResultFile):
+	# 	pcaMulti(centralizedFile, P, pcaFile)
+	# if not os.path.exists(itqResultFile):
+	# 	matrix = readMatrixFromFile(pcaResultFile, haveImgPath=True)
+	# 	matrix = numpy.mat(matrix)
+	# 	print "PCA done"
+	# 	startClock = time.time()
+	# 	B, R = itq(matrix, 50)
+	# 	endClock = time.time()
+	# 	print "ITQone, time used:%f seconds" % (endClock - startClock)
+	# 	writeMatrixToFile(itqResultFile, B)
+	# 	writeMatrixToFile(rmatrixFile, R)
 	if not os.path.exists(binarySearchFile):
-		# os.system("g++ convertBinary.cpp -o convertBinary.bin")
+		os.system("g++ convertBinary.cpp -o convertBinary.bin")
 		os.system("./convertBinary.bin %s" % itqResultFile)
 
