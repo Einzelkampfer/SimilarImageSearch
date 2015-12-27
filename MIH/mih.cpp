@@ -45,9 +45,9 @@ vector<SearchRecord> MihSearcher::searchRecord(bitset<BIT_NUM> record) {
 				set<string>::iterator checkIt = selected.find(targetBucket[j] -> second);
 				if (checkIt == selected.end()) {
 					int dist = hammingDistance(targetBucket[j] -> first, record);
+					selected.insert(targetBucket[j] -> second);
 					if (dist <= RADIUS) {
 						SearchRecord s(targetBucket[j] -> second, dist);
-						selected.insert(targetBucket[j] -> second);
 						result.push_back(s);
 						// cout << dist << "\t" << targetBucket[j] -> second << "\n";
 					}
