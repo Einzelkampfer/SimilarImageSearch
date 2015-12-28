@@ -1,4 +1,4 @@
 *.txt
 *.pyc
-*.sqllite3
+*.sqlite3
 
