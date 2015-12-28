@@ -1,9 +1,9 @@
 /* File: example.i */
-%module basic
+%module example
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "basic.h"
+#include "example.h"
 %}
 
-%include "basic.h"
+%include "example.h"
