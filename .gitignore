@@ -1,4 +1,6 @@
 *.txt
 *.pyc
 *.sqlite3
-
+*.JPEG
+*.jpg
+*.bin

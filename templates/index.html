@@ -1,5 +1,5 @@
 <form action="/upload" method="post"  enctype="multipart/form-data">
 	{% csrf_token %}
-	<input type="file" value="image" />
+	<input type="file" value="image" name="image" />
 	<input type="submit" value="Submit">
 </form>

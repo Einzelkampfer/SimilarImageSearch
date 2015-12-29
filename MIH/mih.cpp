@@ -61,3 +61,7 @@ vector<SearchRecord> MihSearcher::searchRecord(bitset<BIT_NUM> record) {
 	cout << "Lookup Time:" << dur/CLOCKS_PER_SEC << "\n";
 	return result;
 }
+vector<SearchRecord> MihSearcher::searchBinString(string record) {
+	bitset<BIT_NUM> b(record);
+	return searchRecord(b);
+}

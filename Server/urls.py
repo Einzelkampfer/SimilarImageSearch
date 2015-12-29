@@ -14,12 +14,18 @@ Including another URLconf
 	2. Import the include() function: from django.conf.urls import url, include
 	3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import url
+import settings
+from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
+
+from django.contrib import admin
 import views
 # from django.contrib import admin
 
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
-	url(r'^upload', views.uploadPicture)
+	url(r'^upload', views.uploadPicture),
+	url(r'^Images/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.IMG_ROOT}),
+	url(r'^Libimgs/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.LIB_ROOT}),
 	# url(r'^admin/', admin.site.urls),
 ]

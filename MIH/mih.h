@@ -9,6 +9,7 @@ public:
 	MihSearcher();
 	~MihSearcher();
 	vector<SearchRecord> searchRecord(bitset<BIT_NUM> record);
+	vector<SearchRecord> searchBinString(string record);
 private:
 	HashTable hashtables[SLICE_NUM];
 	vector<list<int> >* rNeighbours;

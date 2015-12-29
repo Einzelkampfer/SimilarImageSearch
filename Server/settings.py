@@ -50,7 +50,6 @@ MIDDLEWARE_CLASSES = [
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 ROOT_URLCONF = 'Server.urls'
 
 TEMPLATES = [
@@ -123,3 +122,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+IMG_ROOT = "./static/Images/"
+LIB_ROOT = "/"
+# STATICFILES_DIRS = [
+#     "/",
+# ]
