@@ -1,13 +1,13 @@
 <style>
 img {
-	width: 150px;
+	/*width: 150px;*/
 	height: 200px;
 }
 </style>
 {% load staticfiles %}
 <img src="/{{imgpath}}">
 search time: {{searchTime}} seconds
-<li>test1</li><li>test2</li>
+<li>{{labels}}</li>
 <br/>
 {% for img in result %}
     <img src="/Libimgs{{img}}">

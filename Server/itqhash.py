@@ -7,6 +7,14 @@ import time
 import subprocess
 from basic import *
 
+def getWordMap():
+	lines = open("words.txt").read().strip().split("\n")
+	wordMap = {}
+	for l in lines:
+		l = l.split("\t")
+		wordMap[l[0]] = l[1]
+	return wordMap
+
 def getFloatVector(items):
 	v = []
 	for f in items:
@@ -14,6 +22,7 @@ def getFloatVector(items):
 	return v
 
 itqCal = None
+wordMap = None
 
 class ItqCalculator():
 	def __init__(self):
@@ -43,12 +52,16 @@ class ItqCalculator():
 			# result.append(int(caffeFeature[0, i]))
 		return result
 
+
+
 if itqCal is None:
 	# p = subprocess.Popen('MIH/mih.bin',
 	# 	shell=True,
 	# 	stdout=subprocess.PIPE,
 	# 	stderr=subprocess.PIPE)
+	os.system("rm static/Images/*")
 	itqCal = ItqCalculator()
+	wordMap = getWordMap()
 
 def getHash(caffeFeature):
 	return itqCal.getHashedFeature(caffeFeature)
