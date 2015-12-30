@@ -55,10 +55,10 @@ class ItqCalculator():
 
 
 if itqCal is None:
-	# p = subprocess.Popen('MIH/mih.bin',
-	# 	shell=True,
-	# 	stdout=subprocess.PIPE,
-	# 	stderr=subprocess.PIPE)
+	p = subprocess.Popen('MIH/mih.bin',
+		shell=True,
+		stdout=subprocess.PIPE,
+		stderr=subprocess.PIPE)
 	os.system("rm static/Images/*")
 	itqCal = ItqCalculator()
 	wordMap = getWordMap()
